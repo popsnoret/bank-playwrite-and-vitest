@@ -116,6 +116,7 @@ jobs:
         run: npm run lint
 
   deploy:
+    if: github.event_name == 'push'
     needs: [tests, check-frontend, check-backend]
     runs-on: ubuntu-latest
 
