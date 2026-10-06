@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import mysql from "mysql2/promise";
+import { validateAmount } from "./validateAmount.js";
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -93,7 +94,13 @@ app.post("/me/accounts", async (req, res) => {
 
 app.post("/me/accounts/transactions", async (req, res) => {
   const token = req.body.token;
-  const amount = req.body.amount;
+  const amount = Number(req.body.amount);
+
+  if (!validateAmount(amount)) {
+    return res.status(400).json({
+      message: "Beloppet måste vara större än 0.",
+    });
+  }
 
   const sessions = await query("SELECT * FROM sessions WHERE token = ?", [token]);
 
@@ -105,14 +112,75 @@ app.post("/me/accounts/transactions", async (req, res) => {
     });
   }
 
-  await query("UPDATE accounts SET amount = amount + ? WHERE userId = ?", [Number(amount), session.userId]);
+  const connection = await pool.getConnection();
 
-  const accounts = await query("SELECT * FROM accounts WHERE userId = ?", [session.userId]);
+  try {
+    await connection.beginTransaction();
 
-  const account = accounts[0];
+    const [accounts] = await connection.execute("SELECT * FROM accounts WHERE userId = ?", [session.userId]);
+
+    const account = accounts[0];
+
+    if (!account) {
+      await connection.rollback();
+
+      return res.status(404).json({
+        message: "Kontot hittades inte",
+      });
+    }
+
+    await connection.execute("UPDATE accounts SET amount = amount + ? WHERE id = ?", [amount, account.id]);
+
+    await connection.execute("INSERT INTO transactions (accountId, amount) VALUES (?, ?)", [account.id, amount]);
+
+    const [updatedAccounts] = await connection.execute("SELECT * FROM accounts WHERE id = ?", [account.id]);
+
+    await connection.commit();
+
+    res.json({
+      amount: Number(updatedAccounts[0].amount),
+    });
+  } catch (error) {
+    await connection.rollback();
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Kunde inte genomföra insättningen",
+    });
+  } finally {
+    connection.release();
+  }
+});
+
+app.post("/me/transactions", async (req, res) => {
+  const token = req.body.token;
+
+  const sessions = await query("SELECT * FROM sessions WHERE token = ?", [token]);
+
+  const session = sessions[0];
+
+  if (!session) {
+    return res.status(401).json({
+      message: "Ogiltig token",
+    });
+  }
+
+  const transactions = await query(
+    `SELECT transactions.id, transactions.amount, transactions.createdAt
+     FROM transactions
+     JOIN accounts ON transactions.accountId = accounts.id
+     WHERE accounts.userId = ?
+     ORDER BY transactions.createdAt DESC`,
+    [session.userId],
+  );
 
   res.json({
-    amount: Number(account.amount),
+    transactions: transactions.map((transaction) => ({
+      id: transaction.id,
+      amount: Number(transaction.amount),
+      createdAt: transaction.createdAt,
+    })),
   });
 });
 
