@@ -185,6 +185,6 @@ app.post("/me/transactions", async (req, res) => {
 });
 
 // Starta servern
-app.listen(port, () => {
-  console.log(`Bankens backend körs på http://localhost:${port}`);
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Bankens backend körs på http://0.0.0.0:${port}`);
 });
