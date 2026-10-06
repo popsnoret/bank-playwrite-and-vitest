@@ -11,7 +11,12 @@ export default function AccountPage() {
     async function getAccount() {
       const token = localStorage.getItem("token");
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://16.171.141.11:3001"}/me/accounts`, {
+      if (!token) {
+        window.location.href = "/login";
+        return;
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/me/accounts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -35,7 +40,7 @@ export default function AccountPage() {
 
     const token = localStorage.getItem("token");
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://16.171.141.11:3001"}/me/accounts/transactions`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/me/accounts/transactions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -124,6 +129,12 @@ export default function AccountPage() {
               Sätt in pengar
             </button>
           </form>
+          <Link
+            href="/transactions"
+            className="mt-6 inline-block rounded-lg bg-rose-900 px-6 py-3 font-medium text-white hover:bg-rose-800"
+          >
+            Visa transaktioner
+          </Link>
         </section>
       </main>
     </div>
