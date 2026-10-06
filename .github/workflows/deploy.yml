@@ -131,5 +131,5 @@ jobs:
           script: |
             cd /home/ubuntu/bank-playwrite-and-vitest
             git pull
-            sudo docker compose down
-            sudo docker compose up --build -d
+            sudo docker compose -f docker-compose.prod.yml down
+            sudo docker compose -f docker-compose.prod.yml up --build -d
