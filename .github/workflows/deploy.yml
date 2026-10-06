@@ -14,22 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
-    services:
-      mysql:
-        image: mysql:8.4
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: bank
-          MYSQL_USER: bank_app
-          MYSQL_PASSWORD: bank_password
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost -uroot -proot --silent"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=20
-
     steps:
       - name: Hämta repository
         uses: actions/checkout@v4
@@ -45,8 +29,23 @@ jobs:
       - name: Installera backend
         run: npm ci --prefix backend
 
-      - name: Skapa databastabeller
-        run: docker exec -i $(docker ps -q --filter ancestor=mysql:8.4) mysql -ubank_app -pbank_password bank < database/init.sql
+      - name: Starta Docker Compose
+        run: docker compose up -d --build
+
+      - name: Vänta på databasen
+        run: docker compose exec -T mysql mysqladmin ping -h localhost -ubank_app -pbank_password --wait=30
+
+      - name: Vänta på backend
+        run: |
+          until curl --fail http://127.0.0.1:3001; do
+            sleep 2
+          done
+
+      - name: Vänta på frontend
+        run: |
+          until curl --fail http://127.0.0.1:3000; do
+            sleep 2
+          done
 
       - name: Installera tester
         run: npm ci --prefix tests
@@ -59,6 +58,9 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: http://127.0.0.1:3001
         run: npm run build --prefix frontend
+
+      - name: Kör Vitest
+        run: npm run test:unit --prefix tests
 
       - name: Kör tester
         env:

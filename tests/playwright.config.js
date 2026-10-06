@@ -1,17 +1,9 @@
 import { defineConfig } from "@playwright/test";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 
-const testsDirectory = path.dirname(fileURLToPath(import.meta.url));
-const frontendDirectory = path.resolve(testsDirectory, "../frontend");
-const backendDirectory = path.resolve(testsDirectory, "../backend");
-const frontendPort = Number(process.env.FRONTEND_PORT || 3002);
-const backendPort = Number(process.env.BACKEND_PORT || 3001);
-const frontendURL = process.env.FRONTEND_URL || `http://127.0.0.1:${frontendPort}`;
-const backendURL = process.env.BACKEND_URL || `http://127.0.0.1:${backendPort}`;
+const frontendURL = process.env.FRONTEND_URL || "http://127.0.0.1:3000";
 
 export default defineConfig({
-  testDir: testsDirectory,
+  testDir: ".",
   testMatch: "**/*.spec.js",
   testIgnore: "**/*.test.js",
   fullyParallel: false,
@@ -27,29 +19,4 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
-  webServer: [
-    {
-      command: "npm start",
-      cwd: backendDirectory,
-      port: backendPort,
-      env: {
-        ...process.env,
-        PORT: String(backendPort),
-      },
-      reuseExistingServer: !process.env.CI,
-      timeout: 60_000,
-    },
-    {
-      command: "npm run dev",
-      cwd: frontendDirectory,
-      port: frontendPort,
-      env: {
-        ...process.env,
-        PORT: String(frontendPort),
-        NEXT_PUBLIC_API_URL: backendURL,
-      },
-      reuseExistingServer: !process.env.CI,
-      timeout: 120_000,
-    },
-  ],
 });
