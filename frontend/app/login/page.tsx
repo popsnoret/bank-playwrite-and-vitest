@@ -7,28 +7,44 @@ import Link from "next/link";
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const router = useRouter();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://16.171.141.11:3001"}/sessions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username,
-        password,
-      }),
-    });
+    setError("");
+    setLoading(true);
 
-    if (response.ok) {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://16.171.141.11:3001"}/sessions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+
       const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Fel användarnamn eller lösenord.");
+        return;
+      }
 
       localStorage.setItem("token", data.token);
 
       router.push("/account");
+    } catch (error) {
+      console.error(error);
+      setError("Kunde inte kontakta servern. Försök igen.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -89,6 +105,7 @@ export default function LoginPage() {
               value={username}
               onChange={(event) => setUsername(event.target.value)}
               className="rounded-lg border border-rose-900 bg-white px-4 py-3"
+              required
             />
 
             <label
@@ -104,14 +121,25 @@ export default function LoginPage() {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               className="rounded-lg border border-rose-900 bg-white px-4 py-3"
+              required
             />
 
             <button
               type="submit"
-              className="mt-4 rounded-lg bg-sky-900 px-6 py-3 font-medium text-white hover:bg-sky-800"
+              disabled={loading}
+              className="mt-4 rounded-lg bg-sky-900 px-6 py-3 font-medium text-white hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Logga in
+              {loading ? "Loggar in..." : "Logga in"}
             </button>
+
+            {error && (
+              <p
+                role="alert"
+                className="rounded-lg bg-red-100 p-3 text-red-800"
+              >
+                {error}
+              </p>
+            )}
           </form>
         </section>
       </main>
