@@ -32,6 +32,11 @@ jobs:
       - name: Starta Docker Compose
         run: docker compose up -d --build
 
+      - name: Kontrollera containers
+        run: |
+          docker compose ps
+          docker compose logs express
+
       - name: Vänta på databasen
         run: docker compose exec -T mysql mysqladmin ping -h localhost -ubank_app -pbank_password --wait=30
 
