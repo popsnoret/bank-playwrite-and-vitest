@@ -32,6 +32,11 @@ jobs:
       - name: Starta Docker Compose
         run: docker compose up -d --build
 
+      - name: Kontrollera backend
+        run: |
+          docker compose ps
+          docker compose logs express
+
       - name: Kontrollera containers
         run: |
           docker compose ps
