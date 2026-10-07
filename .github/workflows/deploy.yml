@@ -47,13 +47,13 @@ jobs:
 
       - name: Vänta på backend
         run: |
-          until curl --silent --show-error http://127.0.0.1:3001 > /dev/null; do
+          until curl --silent --show-error http://127.0.0.1:3002 > /dev/null; do
             sleep 2
           done
 
       - name: Vänta på frontend
         run: |
-          until curl --fail http://127.0.0.1:3000; do
+          until curl --fail http://127.0.0.1:3002; do
             sleep 2
           done
 
