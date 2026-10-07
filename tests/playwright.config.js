@@ -1,6 +1,6 @@
 import { defineConfig } from "@playwright/test";
 
-const frontendURL = process.env.FRONTEND_URL || "http://127.0.0.1:3000";
+const frontendURL = process.env.FRONTEND_URL || "http://127.0.0.1:3002";
 
 export default defineConfig({
   testDir: ".",

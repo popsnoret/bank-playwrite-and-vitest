@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-const API_URL = process.env.BACKEND_URL || 'http://127.0.0.1:3001';
+const API_URL = process.env.BACKEND_URL || 'http://127.0.0.1:3003';
 
 test.describe('Backend – godkänt nivå', () => {
   test('användaren kan skapas, logga in, se sitt saldo och sätta in pengar', async ({

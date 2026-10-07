@@ -66,7 +66,7 @@ jobs:
 
       - name: Bygg frontend
         env:
-          NEXT_PUBLIC_API_URL: http://127.0.0.1:3001
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:3003
         run: npm run build --prefix frontend
 
       - name: Kör Vitest

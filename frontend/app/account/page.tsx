@@ -16,7 +16,7 @@ export default function AccountPage() {
         return;
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/me/accounts`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3003"}/me/accounts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,7 +40,7 @@ export default function AccountPage() {
 
     const token = localStorage.getItem("token");
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/me/accounts/transactions`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3003"}/me/accounts/transactions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

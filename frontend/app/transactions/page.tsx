@@ -25,7 +25,7 @@ export default function TransactionsPage() {
       }
 
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/me/transactions`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3003"}/me/transactions`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
