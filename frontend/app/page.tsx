@@ -40,7 +40,7 @@ export default function Home() {
           <h1 className=" text-5xl font-bold tracking-tight">Rosa banken</h1>
           <p className="mb-5">Banken för dig med stil och klass!</p>
 
-          <p className="mb-8 text-lg text-slate-600">Vi hjälprt dig skapa ett bankkonto, se saldo samt hantera dina pengar.</p>
+          <p className="mb-8 text-lg text-slate-600">Vi hjälper dig skapa ett bankkonto, se saldo samt hantera dina pengar.</p>
 
           <div className="flex justify-center gap-4">
             <Link
