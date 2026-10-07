@@ -2,6 +2,10 @@ services:
   nextjs:
     build:
       context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://16.171.141.11:3003
+    environment:
+      NEXT_PUBLIC_API_URL: http://16.171.141.11:3003
     ports:
       - "3002:3000"
 
