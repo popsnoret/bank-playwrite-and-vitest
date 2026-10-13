@@ -10,6 +10,7 @@ export default function AccountPage() {
   useEffect(() => {
     async function getAccount() {
       const token = localStorage.getItem("token");
+      console.log("Token finns:", !!token);
 
       if (!token) {
         window.location.href = "/login";
@@ -19,12 +20,13 @@ export default function AccountPage() {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3003"}/me/accounts`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          token,
-        }),
       });
+
+      console.log("Status:", response.status);
+      console.log("Token skickad:", Boolean(token));
+      console.log("Svar:", await response.clone().text());
 
       if (response.ok) {
         const data = await response.json();
@@ -44,9 +46,9 @@ export default function AccountPage() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        token,
         amount: Number(deposit),
       }),
     });

@@ -28,11 +28,8 @@ export default function TransactionsPage() {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3003"}/me/transactions`, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            token,
-          }),
         });
 
         if (!response.ok) {
